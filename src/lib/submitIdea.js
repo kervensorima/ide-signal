@@ -1,3 +1,5 @@
+import { collectDeviceContext } from './deviceContext'
+
 const ENDPOINT = import.meta.env.VITE_APPS_SCRIPT_URL || ''
 const SECRET = import.meta.env.VITE_APPS_SCRIPT_SECRET || ''
 
@@ -10,15 +12,16 @@ export async function submitIdea(payload) {
     return { ok: false, skipped: true, error: 'Google Sheets non configure' }
   }
 
+  const context = await collectDeviceContext()
+
   const body = {
     ...payload,
+    ...context,
     secret: SECRET || undefined,
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-    locale: typeof navigator !== 'undefined' ? navigator.language : '',
   }
 
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 15000)
+  const timeout = setTimeout(() => controller.abort(), 20000)
 
   try {
     const response = await fetch(ENDPOINT, {

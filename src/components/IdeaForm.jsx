@@ -7,6 +7,12 @@ import ResultPanel from './ResultPanel'
 const MIN_CHARS = 20
 const MAX_CHARS = 255
 
+function isValidContact(value) {
+  const looksEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+  const looksUsername = /^@?[a-zA-Z0-9._-]{3,32}$/.test(value) && !/^\d+$/.test(value)
+  return looksEmail || looksUsername
+}
+
 export default function IdeaForm({ onIntensityChange }) {
   const contactId = useId()
   const descriptionId = useId()
@@ -25,16 +31,12 @@ export default function IdeaForm({ onIntensityChange }) {
 
   function validate() {
     const next = {}
+    const value = contact.trim()
 
-    if (contact.trim()) {
-      const value = contact.trim()
-      const looksEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-      const looksPhone = /^[+]?[\d\s().-]{7,20}$/.test(value)
-      const looksUsername = /^@?[a-zA-Z0-9._-]{3,32}$/.test(value)
-      if (!looksEmail && !looksPhone && !looksUsername) {
-        next.contact =
-          "Indique un email, un numéro de téléphone ou un nom d'utilisateur valide."
-      }
+    if (!value) {
+      next.contact = 'Email ou nom d\'utilisateur obligatoire.'
+    } else if (!isValidContact(value)) {
+      next.contact = 'Indique un email valide ou un nom d\'utilisateur (3 à 32 caractères).'
     }
 
     if (charCount < MIN_CHARS) {
@@ -75,7 +77,6 @@ export default function IdeaForm({ onIntensityChange }) {
     setStatus('success')
     onIntensityChange?.(analysis.score / 100)
 
-    // Sauvegarde silencieuse (aucune mention visible pour l'utilisateur)
     if (isSheetsConfigured()) {
       void submitIdea({
         contact: contact.trim(),
@@ -103,10 +104,10 @@ export default function IdeaForm({ onIntensityChange }) {
       <form onSubmit={handleSubmit} noValidate className="space-y-6">
         <div>
           <label htmlFor={contactId} className="block text-sm font-semibold text-mist">
-            Contact <span className="font-normal text-fog">(optionnel)</span>
+            Contact <span className="font-normal text-fog">(obligatoire)</span>
           </label>
           <p id={`${contactId}-hint`} className="mt-1 text-sm text-fog">
-            Email, téléphone ou nom d&apos;utilisateur
+            Email ou nom d&apos;utilisateur
           </p>
           <input
             id={contactId}
@@ -114,6 +115,7 @@ export default function IdeaForm({ onIntensityChange }) {
             type="text"
             autoComplete="email"
             inputMode="email"
+            required
             value={contact}
             onChange={(e) => {
               setContact(e.target.value)
@@ -121,7 +123,8 @@ export default function IdeaForm({ onIntensityChange }) {
             }}
             aria-describedby={`${contactId}-hint${errors.contact ? ` ${contactErrorId}` : ''}`}
             aria-invalid={Boolean(errors.contact)}
-            placeholder="ex. toi@email.com ou +509...."
+            aria-required="true"
+            placeholder="ex. toi@email.com ou @tonpseudo"
             className="mt-3 w-full rounded-none border-0 border-b border-white/20 bg-transparent px-0 py-3 text-base text-snow outline-none transition placeholder:text-fog/60 focus:border-signal"
           />
           {errors.contact ? (

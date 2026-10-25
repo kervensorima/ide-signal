@@ -1,18 +1,39 @@
 /**
  * IDE SIGNAL — Google Apps Script Web App
  *
- * 1. Create Google Sheet "IDE SIGNAL Leads"
- * 2. Extensions → Apps Script → paste this file
- * 3. Deploy → New deployment → Web app
- *    Execute as: Me | Who has access: Anyone
- * 4. Put the Web App URL in VITE_APPS_SCRIPT_URL
+ * Redeploy after changes: Deploy → Manage deployments → Edit → New version
  */
 
 var SHEET_NAME = 'Leads'
-var API_SECRET = '' // optional: match VITE_APPS_SCRIPT_SECRET
+var API_SECRET = ''
+
+var HEADERS = [
+  'Timestamp',
+  'Contact',
+  'Description',
+  'Category',
+  'Score',
+  'Estimated Value',
+  'Analysis',
+  'Status',
+  'Locale',
+  'User Agent',
+  'IP',
+  'Location',
+  'City',
+  'Region',
+  'Country',
+  'Postal',
+  'Latitude',
+  'Longitude',
+  'Geo Source',
+  'ISP',
+  'Device Summary',
+  'Device JSON',
+]
 
 function doGet() {
-  return json_({ ok: true, service: 'IDE SIGNAL', version: 1 })
+  return json_({ ok: true, service: 'IDE SIGNAL', version: 2 })
 }
 
 function doPost(e) {
@@ -30,9 +51,26 @@ function doPost(e) {
     var score = Number(data.score)
     var estimatedValue = String(data.estimatedValue || '').trim().slice(0, 80)
     var analysis = String(data.analysis || '').trim().slice(0, 500)
-    var userAgent = String(data.userAgent || '').trim().slice(0, 200)
+    var userAgent = String(data.userAgent || '').trim().slice(0, 300)
     var locale = String(data.locale || '').trim().slice(0, 20)
     var rejected = Boolean(data.rejected)
+
+    var ip = String(data.ip || '').trim().slice(0, 64)
+    var location = String(data.location || '').trim().slice(0, 160)
+    var city = String(data.city || '').trim().slice(0, 80)
+    var region = String(data.region || '').trim().slice(0, 80)
+    var country = String(data.country || '').trim().slice(0, 80)
+    var postal = String(data.postal || '').trim().slice(0, 30)
+    var latitude = String(data.latitude || '').trim().slice(0, 32)
+    var longitude = String(data.longitude || '').trim().slice(0, 32)
+    var geoSource = String(data.geoSource || '').trim().slice(0, 40)
+    var isp = String(data.isp || '').trim().slice(0, 120)
+    var deviceSummary = String(data.deviceSummary || '').trim().slice(0, 200)
+    var deviceJson = String(data.deviceJson || '').trim().slice(0, 800)
+
+    if (!contact) {
+      return json_({ ok: false, error: 'Contact required' })
+    }
 
     if (description.length < 20 || description.length > 255) {
       return json_({ ok: false, error: 'Invalid description length' })
@@ -56,6 +94,18 @@ function doPost(e) {
       rejected ? 'rejected' : 'ok',
       locale,
       userAgent,
+      ip,
+      location,
+      city,
+      region,
+      country,
+      postal,
+      latitude,
+      longitude,
+      geoSource,
+      isp,
+      deviceSummary,
+      deviceJson,
     ])
 
     return json_({ ok: true, saved: true })
@@ -69,18 +119,22 @@ function getOrCreateSheet_() {
   var sheet = ss.getSheetByName(SHEET_NAME)
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME)
-    sheet.appendRow([
-      'Timestamp',
-      'Contact',
-      'Description',
-      'Category',
-      'Score',
-      'Estimated Value',
-      'Analysis',
-      'Status',
-      'Locale',
-      'User Agent',
-    ])
+    sheet.appendRow(HEADERS)
+    sheet.setFrozenRows(1)
+    return sheet
+  }
+
+  var lastCol = Math.max(sheet.getLastColumn(), HEADERS.length)
+  var current = sheet.getRange(1, 1, 1, lastCol).getValues()[0]
+  var needsUpdate = false
+  for (var i = 0; i < HEADERS.length; i++) {
+    if (String(current[i] || '') !== HEADERS[i]) {
+      needsUpdate = true
+      break
+    }
+  }
+  if (needsUpdate) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
     sheet.setFrozenRows(1)
   }
   return sheet
