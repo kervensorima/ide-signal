@@ -18,7 +18,6 @@ export default function IdeaForm({ onIntensityChange }) {
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle')
   const [result, setResult] = useState(null)
-  const [saveNote, setSaveNote] = useState('')
 
   const charCount = description.length
   const remaining = MAX_CHARS - charCount
@@ -34,7 +33,7 @@ export default function IdeaForm({ onIntensityChange }) {
       const looksUsername = /^@?[a-zA-Z0-9._-]{3,32}$/.test(value)
       if (!looksEmail && !looksPhone && !looksUsername) {
         next.contact =
-          "Indique un email, un numéro de téléphone, ou un nom d'utilisateur valide."
+          "Indique un email, un numéro de téléphone ou un nom d'utilisateur valide."
       }
     }
 
@@ -60,7 +59,6 @@ export default function IdeaForm({ onIntensityChange }) {
 
     setStatus('loading')
     setResult(null)
-    setSaveNote('')
     onIntensityChange?.(0.4)
 
     await delay(900)
@@ -77,8 +75,9 @@ export default function IdeaForm({ onIntensityChange }) {
     setStatus('success')
     onIntensityChange?.(analysis.score / 100)
 
+    // Sauvegarde silencieuse (aucune mention visible pour l'utilisateur)
     if (isSheetsConfigured()) {
-      const saved = await submitIdea({
+      void submitIdea({
         contact: contact.trim(),
         description: description.trim(),
         category: analysis.category,
@@ -87,13 +86,6 @@ export default function IdeaForm({ onIntensityChange }) {
         analysis: analysis.analysis,
         rejected: false,
       })
-      setSaveNote(
-        saved.ok
-          ? 'Ide anrejistre nan Google Sheet.'
-          : `Analiz OK, men anrejistreman echwe: ${saved.error}`
-      )
-    } else {
-      setSaveNote('Analiz lokal OK. Google Sheets poko konfigire (gade SETUP-GOOGLE-SHEETS.md).')
     }
   }
 
@@ -102,7 +94,6 @@ export default function IdeaForm({ onIntensityChange }) {
     setDescription('')
     setErrors({})
     setResult(null)
-    setSaveNote('')
     setStatus('idle')
     onIntensityChange?.(0)
   }
@@ -155,7 +146,7 @@ export default function IdeaForm({ onIntensityChange }) {
             </span>
           </div>
           <p id={`${descriptionId}-hint`} className="mt-1 text-sm text-fog">
-            Entre {MIN_CHARS} et {MAX_CHARS} caractères. Ide klè sèlman: pa tenten, pa mo sal.
+            Entre {MIN_CHARS} et {MAX_CHARS} caractères. Sois concret: quoi, pour qui, comment.
           </p>
           <textarea
             id={descriptionId}
@@ -175,7 +166,7 @@ export default function IdeaForm({ onIntensityChange }) {
               errors.description ? ` ${descriptionErrorId}` : ''
             }`}
             aria-invalid={Boolean(errors.description)}
-            placeholder="Ex. Mwen bezwen yon ecommerce pou vann rad online..."
+            placeholder="Ex. J'ai besoin d'un ecommerce pour vendre des vêtements en ligne..."
             className="mt-3 w-full resize-y rounded-2xl border border-white/12 bg-ink-soft/80 px-4 py-3 text-base leading-relaxed text-snow outline-none transition placeholder:text-fog/55 focus:border-signal/70 focus:ring-2 focus:ring-signal/25"
           />
           {errors.description ? (
@@ -230,7 +221,7 @@ export default function IdeaForm({ onIntensityChange }) {
 
         {status === 'success' ? (
           <p className="text-sm font-medium text-ok" role="status">
-            Analyse terminée. {saveNote}
+            Analyse terminée. Résultat affiché ci-dessous.
           </p>
         ) : null}
       </form>

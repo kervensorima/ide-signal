@@ -1,13 +1,11 @@
-# Connecter Google Sheets (2-3 minutes)
+# Google Sheets (deja configure)
 
-1. Ouvre https://sheets.google.com et cree une feuille **IDE SIGNAL Leads**.
-2. Menu **Extensions → Apps Script**.
-3. Colle le contenu de `google-apps-script/Code.gs`.
-4. **Deploy → New deployment → Web app**
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-5. Copie l'URL `https://script.google.com/macros/s/.../exec`
-6. Local: cree `.env` avec `VITE_APPS_SCRIPT_URL=...`
-7. Netlify: Site settings → Environment variables → `VITE_APPS_SCRIPT_URL` → redeploy
+## Ressources
 
-Test: soumets une idee. Une ligne doit apparaitre dans l'onglet **Leads**.
+- Sheet: https://docs.google.com/spreadsheets/d/1c6hJtomymLnFHGZjkog0P4AdUSO-5ORXsHEsvr85VWI/edit
+- Web App URL: `https://script.google.com/macros/s/AKfycbwcj7exnzhCdlLRKOewHL1_MZfEfUwPSmehTO3IM5ObGUHQfY2gyb3DhFzMr93vcPH7RQ/exec`
+- Local `.env`: `VITE_APPS_SCRIPT_URL` (deja present, gitignore)
+
+## Redeploy
+
+Apres changement du script Google, redeploy le frontend pour que l'URL soit reinjectee au build.

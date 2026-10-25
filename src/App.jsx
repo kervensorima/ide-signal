@@ -28,8 +28,8 @@ export default function App() {
             transition={{ delay: 0.35, duration: 0.6 }}
             className="mt-6 max-w-md text-base leading-relaxed text-mist sm:text-lg"
           >
-            Pataje ide pwojè ou a. N ap mezire fòs siyal la epi ba ou yon score
-            d&apos;opportunité.
+            Partage ton idée de projet. On mesure la force du signal et on te donne
+            un score d&apos;opportunité.
           </motion.p>
         </motion.header>
 
@@ -43,7 +43,7 @@ export default function App() {
             Envoie ton idée
           </h1>
           <p className="mt-2 text-sm text-fog sm:text-base">
-            Pas besoin de plan parfait. Une description claire suffit pour démarrer.
+            Pas besoin d&apos;un plan parfait. Une description claire suffit pour commencer.
           </p>
 
           <div className="mt-8">

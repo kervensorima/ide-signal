@@ -248,50 +248,50 @@ export function detectNonsense(description) {
     return {
       isNonsense: true,
       message:
-        'Nou pa aksepte mo ofansan ni kontni ki pa pwofesyonèl. Tanpri dekri ide pwojè a avèk respè.',
+        'Contenu non professionnel détecté. Merci de décrire ton idée de projet avec respect.',
     }
   }
 
   if (words.length < 4) {
     return {
       isNonsense: true,
-      message: 'Ekri omwen 4 mo ki dekri byen ide pwojè a (sa w vle, pou ki moun, ki kalite).',
+      message:
+        'Écris au moins 4 mots qui décrivent bien ton idée (quoi, pour qui, quel type).',
     }
   }
 
   if (unique.size <= 2 && words.length >= 4) {
     return {
       isNonsense: true,
-      message: 'Pa repete menm mo yo. Bay yon deskripsyon ki gen sans.',
+      message: 'Évite de répéter les mêmes mots. Donne une description claire.',
     }
   }
 
   if (words.filter((w) => FILLER_ONLY.test(w)).length >= Math.ceil(words.length * 0.5)) {
     return {
       isNonsense: true,
-      message: 'Sa a pa yon ide pwojè. Ekri yon fraz ki gen sans sou sa ou vle bati.',
+      message: "Ce n'est pas une idée de projet. Écris une phrase claire sur ce que tu veux construire.",
     }
   }
 
   if (words.length < 3 && lettersOnly.length >= 18) {
     return {
       isNonsense: true,
-      message:
-        'Sa a sanble tenten. Dekri ide a ak mo klè (sa w vle bati, pou ki moun).',
+      message: 'Texte peu clair. Décris ton idée avec des mots précis (quoi, pour qui).',
     }
   }
 
   if (repeatedCharRatio(text) > 0.28 || /(.)\1{4,}/.test(text)) {
     return {
       isNonsense: true,
-      message: 'Gen twòp karaktè ki repete. Ekri yon deskripsyon reyèl nan ide pwojè a.',
+      message: 'Trop de caractères répétés. Écris une vraie description de projet.',
     }
   }
 
   if (lettersOnly.length >= 12 && vowelRatio(lettersOnly) < 0.18) {
     return {
       isNonsense: true,
-      message: 'Teks la pa lisib. Tanpri ekri yon ide klè an kreyòl, franse, angle oswa panyòl.',
+      message: 'Texte illisible. Écris une idée claire en français, anglais, espagnol ou créole.',
     }
   }
 
@@ -301,7 +301,7 @@ export function detectNonsense(description) {
   if (smashCount >= 1) {
     return {
       isNonsense: true,
-      message: 'Nou rekonèt tenten / keyboard smash. Tanpri pataje yon ide pwojè serye.',
+      message: 'Saisie aléatoire détectée. Merci de partager une idée de projet sérieuse.',
     }
   }
 
@@ -315,16 +315,15 @@ export function detectNonsense(description) {
     return {
       isNonsense: true,
       message:
-        'Nou pa rive konprann ide a. Egzanp: "Mwen bezwen yon ecommerce pou vann rad online".',
+        'Idée incompréhensible. Exemple: "J\'ai besoin d\'un ecommerce pour vendre des vêtements en ligne".',
     }
   }
 
-  // Readable but not a project idea (greeting / random chat)
   if (!categoryOk && !intentOk && realHits < 4) {
     return {
       isNonsense: true,
       message:
-        'Sa a pa sanble yon ide pwojè. Di sa w vle bati (app, sit, ecommerce...) ak pou ki moun.',
+        "Cela ne ressemble pas à une idée de projet. Dis ce que tu veux construire (app, site, ecommerce...) et pour qui.",
     }
   }
 
@@ -332,14 +331,14 @@ export function detectNonsense(description) {
     return {
       isNonsense: true,
       message:
-        'Ajoute yon entansyon klè: bezwen / vle / need / quiero + kalite pwojè a.',
+        'Ajoute une intention claire: besoin / veux / need / quiero + le type de projet.',
     }
   }
 
   if (lettersOnly.length < Math.min(12, raw.length * 0.45)) {
     return {
       isNonsense: true,
-      message: 'Itilize sitou mo, pa sèlman chif oswa senbòl.',
+      message: 'Utilise surtout des mots, pas seulement des chiffres ou des symboles.',
     }
   }
 
@@ -405,8 +404,8 @@ export function analyzeIdea(description) {
   const band = VALUE_BANDS.find((b) => score >= b.min)
 
   const analysis = best
-    ? `Signal detecte: ${category}. Mots cles reconnus (${locales.join(', ')}). Score indicatif base sur clarte et potentiel commercial estime.`
-    : 'Idee ouverte. Ajoute le type de produit, le public cible et le canal (app, site, ecommerce) pour renforcer le signal.'
+    ? `Signal détecté: ${category}. Mots-clés reconnus (${locales.join(', ')}). Score indicatif basé sur la clarté et le potentiel commercial estimé.`
+    : 'Idée ouverte. Ajoute le type de produit, le public cible et le canal (app, site, ecommerce) pour renforcer le signal.'
 
   return {
     rejected: false,
